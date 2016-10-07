@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class Main {
 
     /**
-     * 多项式类，有描述多项式的各种属
+     * 多项式类，有描述多项式的各种属性
      */
     private class Expression {
         public String[] vars;  //变量数组
