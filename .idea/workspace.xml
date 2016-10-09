@@ -943,7 +943,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.3" />
               </list>
             </option>
           </splitter-proportions>
@@ -975,3 +975,4 @@
     </states>
   </component>
 </project>
+
