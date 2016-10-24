@@ -1,3 +1,4 @@
+package lab1;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Scanner;
@@ -10,95 +11,104 @@ import java.util.regex.Pattern;
  * Created by ZouKaifa on 2016/9/5.
  */
 public class Main {
-
-    /**
-     * 多项式类，有描述多项式的各种属性
+    
+    /**.
+     * 澶氶」寮忕被锛屾湁鎻忚堪澶氶」寮忕殑鍚勭灞炴��
      */
     private class Expression {
-        public String[] vars;  //变量数组
-        public int length;  //项数
-        public double[][] values;  //每一项中常数及各个变量的次数（列下标代表项，第一行为常数，第二行开始为变量）
-        public String exp;  //标准的格式化字符串形式
+        
+        private String[] vars;  //鍙橀噺鏁扮粍
+        
+        private int length;  //椤规暟.
+        
+        private double[][] values;  //姣忎竴椤逛腑甯告暟鍙婂悇涓
+        //彉閲忕殑娆℃暟锛堝垪涓嬫爣浠ｈ〃椤癸紝绗竴琛屼负甯告暟锛岀浜岃寮�濮嬩负鍙橀噺锛�.
+        
+        private String exp;  //鏍囧噯鐨勬牸寮忓寲瀛楃涓插舰寮�.
     }
-
-    private Expression exp;  //当前处理的表达式
-
-    /**
-     * 获得当前的表达式
+    
+    private Expression exp;  //褰撳墠澶勭悊鐨勮〃杈惧紡
+    
+    /**.
+     * 鑾峰緱褰撳墠鐨勮〃杈惧紡
      *
-     * @return 当前表达式
+     * @return 褰撳墠琛ㄨ揪寮�
      */
-    public Expression getExp() {
+    public final Expression getExp() {
         return exp;
     }
-
-    /**
-     * 设置正在处理的表达式
+    
+    /**.
+     * 璁剧疆姝ｅ湪澶勭悊鐨勮〃杈惧紡
      *
-     * @param exp 表达式
+     * @param exp 琛ㄨ揪寮�
      */
-    public void setExp(Expression exp) {
+    private void setExp(Expression  exp) {
         this.exp = exp;
     }
-
-    /**
-     * 表达式判断、处理
+    
+    /**.
+     * 琛ㄨ揪寮忓垽鏂�佸鐞�
      *
-     * @param expStr 表达式字符串
-     * @return 生成的表达式对象
+     * @param expStr 琛ㄨ揪寮忓瓧绗︿覆
+     * @return 鐢熸垚鐨勮〃杈惧紡瀵硅薄
      */
     private Expression expression(String expStr) {
-        Pattern single = Pattern.compile("((\\d+)|([a-zA-Z]+(\\s*\\^\\s*[1-9][0-9]*)?))");  //字母/数字
-        Pattern nape = Pattern.compile(single + "((\\s*\\*\\s*)?" + single + ")*");  //一项
-        Pattern pattern = Pattern.compile("\\s*-?" + nape + "(\\s*[+-]\\s*" + nape + ")*");  //整个表达式
+        Pattern single = Pattern.compile("((\\d+)|([a-zA-Z]+(\\s*\\^\\s*[1-9][0-9]*)?))");
+        //瀛楁瘝/鏁板瓧
+        Pattern nape = Pattern.compile(single + "((\\s*\\*\\s*)?" + single + ")*");  //涓�椤�
+        Pattern pattern = Pattern.compile("\\s*-?" + nape + "(\\s*[+-]\\s*" + nape + ")*");  //鏁翠釜琛ㄨ揪寮�
         Matcher matcher = pattern.matcher(expStr);
-        if (matcher.find() && matcher.group().equals(expStr)) {  //匹配成功
+        if (matcher.find() && matcher.group().equals(expStr)) {  //鍖归厤鎴愬姛
             return deal(expStr);
         }
         return null;
     }
-
-    /**
-     * 对正确的字符串进行处理，包括含有小数、负数的字符串
+    
+    /**.
+     * 瀵规纭殑瀛楃涓茶繘琛屽鐞嗭紝鍖呮嫭鍚湁灏忔暟銆佽礋鏁扮殑瀛楃涓�
      *
      * @param expStr
-     * @return
+     * @return Expression
      */
     private Expression deal(String expStr) {
         Expression expr = new Expression();
-        Pattern tSingle = Pattern.compile("((\\d+(\\.\\d+)?)|([a-zA-Z]+(\\s*\\^\\s*[1-9][0-9]*)?))");  //可检测小数
-        Pattern tNape = Pattern.compile(tSingle + "((\\s*\\*\\s*)?" + tSingle + ")*");  //含小数的项
-        expr.length = expStr.split("[+-]").length;  //项数
-        if (expStr.startsWith("-")) {  //不算第一项的负号
+        Pattern tSingle = Pattern.compile("((\\d+(\\.\\d+)?)|([a-zA-Z]+(\\s*\\^\\s*[1-9][0-9]*)?))");
+        //鍙娴嬪皬鏁�
+        
+        //鍚皬鏁扮殑椤�
+        expr.length = expStr.split("[+-]").length;  //椤规暟
+        if (expStr.startsWith("-")) {  //涓嶇畻绗竴椤圭殑璐熷彿
             expr.length -= 1;
         }
-
-        TreeSet<String> varSet = new TreeSet<>();  //使用TreeSet收集变量数
+        
+        TreeSet<String> varSet = new TreeSet<>();  //浣跨敤TreeSet鏀堕泦鍙橀噺鏁�
         Matcher varMatch = Pattern.compile("[a-zA-Z]+").matcher(expStr);
         while (varMatch.find()) {
             varSet.add(varMatch.group());
         }
         expr.vars = new String[varSet.size()];
-        expr.vars = varSet.toArray(expr.vars);  //将set转为数组
+        expr.vars = varSet.toArray(expr.vars);  //灏唖et杞负鏁扮粍
         expr.values = new double[expr.vars.length + 1][expr.length];
-        for (int i = 0; i < expr.values.length; i++) {  //全赋0便于化简，常数赋1
+        for (int i = 0; i < expr.values.length; i++) {  //鍏ㄨ祴0渚夸簬鍖栫畝锛屽父鏁拌祴1
             for (int j = 0; j < expr.values[0].length; j++) {
                 expr.values[i][j] = i == 0 ? 1 : 0;
             }
         }
-        expStr = expStr.replaceAll("\\s", "");  //去空格
+        expStr = expStr.replaceAll("\\s", "");  //鍘荤┖鏍�
+        Pattern tNape = Pattern.compile(tSingle + "((\\s*\\*\\s*)?" + tSingle + ")*");
         Matcher valMatch = tNape.matcher(expStr);
-        int j = 0;  //列下标
+        int j = 0;  //鍒椾笅鏍�
         while (valMatch.find()) {
             String val = valMatch.group();
             Matcher sin = tSingle.matcher(val);
-            while (sin.find()) {  //分析单项的成分
+            while (sin.find()) {  //鍒嗘瀽鍗曢」鐨勬垚鍒�
                 String re = sin.group();
-                if (re.matches("\\d+(\\.\\d+)?")) {  //常数则直接相乘
+                if (re.matches("\\d+(\\.\\d+)?")) {  //甯告暟鍒欑洿鎺ョ浉涔�
                     expr.values[0][j] *= Double.parseDouble(re);
-                } else {  //变量则次数相加
+                } else {  //鍙橀噺鍒欐鏁扮浉鍔�
                     String str = re.contains("^") ? re.split("\\s*\\^\\s*")[0] : re;
-                    for (int i = 0; i < expr.vars.length; i++) {  //找寻行下标
+                    for (int i = 0; i < expr.vars.length; i++) {  //鎵惧琛屼笅鏍�
                         if (expr.vars[i].equals(str)) {
                             expr.values[i + 1][j] += re.contains("^") ? Double.parseDouble(re.split("\\s*\\^\\s*")[1]) : 1;
                             break;
@@ -108,7 +118,7 @@ public class Main {
             }
             int index = valMatch.start();
             if (j > 0 || expStr.startsWith("-")) {
-                if (expStr.charAt(index - 1) == '-') {  //该项前面是否存在负号
+                if (expStr.charAt(index - 1) == '-') {  //璇ラ」鍓嶉潰鏄惁瀛樺湪璐熷彿
                     expr.values[0][j] *= -1;
                 }
             }
@@ -117,43 +127,43 @@ public class Main {
         generate(expr);
         return expr;
     }
-
-
-    /**
-     * 表达式简化求值
+    
+    
+    /**.
+     * 琛ㄨ揪寮忕畝鍖栨眰鍊�
      *
-     * @param expStr 变量赋值式
-     * @return 简化后的表达式对象
+     * @param expStr 鍙橀噺璧嬪�煎紡
+     * @return 绠�鍖栧悗鐨勮〃杈惧紡瀵硅薄
      */
     private Expression simplify(String expStr) {
         if ((Pattern.compile(
-                "!\\s*simplify(\\s*[a-zA-z]+\\s*=\\s*([+-]?(\\d+(\\.\\d+)?))\\s*)*")
-        ).matcher(expStr).find()) {  //符合语法
+                             "!\\s*simplify(\\s*[a-zA-z]+\\s*=\\s*([+-]?(\\d+(\\.\\d+)?))\\s*)*")
+             ).matcher(expStr).find()) {  //绗﹀悎璇硶
             Matcher assign = Pattern.compile(
-                    "[a-z]+\\s*=\\s*([+-]?(\\d+(\\.\\d+)?))").matcher(expStr);  //匹配赋值语句
-            String str = exp.exp;  //格式化字符串
+                                             "[a-z]+\\s*=\\s*([+-]?(\\d+(\\.\\d+)?))").matcher(expStr);  //鍖归厤璧嬪�艰鍙�
+            String str = exp.exp;  //鏍煎紡鍖栧瓧绗︿覆
             /*
-            使用格式化后的字符串，先将幂替换为数字，再将1次幂替换，再使用expression方法将替换
-            后的字符串转为Expression对象
-            */
+             浣跨敤鏍煎紡鍖栧悗鐨勫瓧绗︿覆锛屽厛灏嗗箓鏇挎崲涓烘暟瀛楋紝鍐嶅皢1娆″箓鏇挎崲锛屽啀浣跨敤expression鏂规硶灏嗘浛鎹�
+             鍚庣殑瀛楃涓茶浆涓篍xpression瀵硅薄
+             */
             while (assign.find()) {
                 String ass = assign.group().replaceAll("\\s", "");
-                String var = ass.split("=")[0];  //变量及其值
+                String var = ass.split("=")[0];  //鍙橀噺鍙婂叾鍊�
                 double value = Double.parseDouble(ass.split("=")[1]);
-                Matcher varMatch = Pattern.compile("\\b" + var + "\\b\\^\\d+").matcher(str);  //匹配幂项
+                Matcher varMatch = Pattern.compile("\\b" + var + "\\b\\^\\d+").matcher(str);  //鍖归厤骞傞」
                 while (varMatch.find()) {
                     String t = varMatch.group();
                     double newValue = Math.pow(value, Integer.parseInt(t.split("\\^")[1]));
-                    //若值为负数，则仅改变这一项的符号
+                    //鑻ュ�间负璐熸暟锛屽垯浠呮敼鍙樿繖涓�椤圭殑绗﹀彿
                     if (newValue < 0) {
                         str = changeSymbol(str, t);
                     }
                     varMatch = Pattern.compile("\\b" + var + "\\b\\^\\d+").matcher(str);
                     varMatch.find();
-                    str = varMatch.replaceAll(String.valueOf(Math.abs(newValue)));  //替换
-                    varMatch = Pattern.compile("\\b" + var + "\\b\\^\\d+").matcher(str);  //重新匹配
+                    str = varMatch.replaceAll(String.valueOf(Math.abs(newValue)));  //鏇挎崲
+                    varMatch = Pattern.compile("\\b" + var + "\\b\\^\\d+").matcher(str);  //閲嶆柊鍖归厤
                 }
-                //再单独替换1次变量
+                //鍐嶅崟鐙浛鎹�1娆″彉閲�
                 if (value < 0) {
                     str = changeSymbol(str, var);
                 }
@@ -166,19 +176,19 @@ public class Main {
         }
         return null;
     }
-
-
-    /**
-     * 幂或变量替换结果若为负数，则不使用负数替换，而改变其所在项前面的符号
+    
+    
+    /**.
+     * 骞傛垨鍙橀噺鏇挎崲缁撴灉鑻ヤ负璐熸暟锛屽垯涓嶄娇鐢ㄨ礋鏁版浛鎹紝鑰屾敼鍙樺叾鎵�鍦ㄩ」鍓嶉潰鐨勭鍙�
      *
-     * @param originStr 原多项式字串
-     * @param var       会被替换为负数的幂或变量
-     * @return 改变符号后的字符串（未进行变量替换，仅改变项的符号）
+     * @param originStr 鍘熷椤瑰紡瀛椾覆
+     * @param var       浼氳鏇挎崲涓鸿礋鏁扮殑骞傛垨鍙橀噺
+     * @return 鏀瑰彉绗﹀彿鍚庣殑瀛楃涓诧紙鏈繘琛屽彉閲忔浛鎹紝浠呮敼鍙橀」鐨勭鍙凤級
      */
     private String changeSymbol(String originStr, String var) {
         Matcher matcher;
         if (var.contains("^")) {
-            matcher = Pattern.compile("\\b" + var.split("\\^")[0] + "\\b\\^" + var.split("\\^")[1]).matcher(originStr);
+            matcher=Pattern.compile("\\b"+var.split("\\^")[0]+"\\b\\^"+var.split("\\^")[1]).matcher(originStr);
         } else {
             matcher = Pattern.compile("\\b" + var + "\\b").matcher(originStr);
         }
@@ -186,17 +196,17 @@ public class Main {
         if (matcher.find()) {
             Matcher originMatch = matcher.pattern().matcher(originStr);
             originMatch.reset();
-            int add = 0;  //是否在前面加了负号或去掉
+            int add = 0;  //鏄惁鍦ㄥ墠闈㈠姞浜嗚礋鍙锋垨鍘绘帀
             while (originMatch.find()) {
-                int index = originMatch.start() + add;  //替换位置的索引
+                int index = originMatch.start() + add;  //鏇挎崲浣嶇疆鐨勭储寮�
                 StringBuffer temp = new StringBuffer(originStr);
-                while (index >= 0) {  //向前寻找最近的加减号
+                while (index >= 0) {  //鍚戝墠瀵绘壘鏈�杩戠殑鍔犲噺鍙�
                     if (temp.charAt(index) == '+') {
                         temp.setCharAt(index, '-');
                         originStr = temp.toString();
                         break;
                     } else if (temp.charAt(index) == '-') {
-                        if (index == 0) {  //若负号已处于最开始，则将负号去掉
+                        if (index == 0) {  //鑻ヨ礋鍙峰凡澶勪簬鏈�寮�濮嬶紝鍒欏皢璐熷彿鍘绘帀
                             originStr = originStr.substring(1);
                             add--;
                         } else {
@@ -207,7 +217,7 @@ public class Main {
                     }
                     index--;
                 }
-                if (index == -1 && !originStr.startsWith("-")) {  //未找到符号，即该项为首项且正
+                if (index == -1 && !originStr.startsWith("-")) {  //鏈壘鍒扮鍙凤紝鍗宠椤逛负棣栭」涓旀
                     originStr = "-" + originStr;
                     add++;
                 }
@@ -216,16 +226,16 @@ public class Main {
         }
         return originStr;
     }
-
-    /**
-     * 表达式求导
+    
+    /**.
+     * 琛ㄨ揪寮忔眰瀵�
      *
-     * @param expStr 求导变量字符串
-     * @return 求导后的表达式对象
+     * @param expStr 姹傚鍙橀噺瀛楃涓�
+     * @return 姹傚鍚庣殑琛ㄨ揪寮忓璞�
      */
     private Expression derivative(String expStr) {
         Expression newExp = new Expression();
-        //复制原exp的数据
+        //澶嶅埗鍘焑xp鐨勬暟鎹�
         newExp.values = new double[exp.values.length][exp.length];
         for (int i = 0; i < exp.values.length; i++) {
             System.arraycopy(exp.values[i], 0, newExp.values[i], 0, exp.length);
@@ -234,32 +244,32 @@ public class Main {
         newExp.length = exp.length;
         newExp.exp = exp.exp;
         Pattern pat = Pattern.compile("!\\s*d/d\\s*[a-zA-z]+");
-        Matcher match = pat.matcher(expStr);  //语法检测
+        Matcher match = pat.matcher(expStr);  //璇硶妫�娴�
         if (match.find()) {
             expStr = expStr.replace("d/d", "");
-            Matcher varMatch = Pattern.compile("[a-zA-z]+").matcher(expStr);  //寻找求导的变量
+            Matcher varMatch = Pattern.compile("[a-zA-z]+").matcher(expStr);  //瀵绘壘姹傚鐨勫彉閲�
             int time = 0;
             String va = "";
-            while (varMatch.find()) {  //判断求导的变量个数是否为1
+            while (varMatch.find()) {  //鍒ゆ柇姹傚鐨勫彉閲忎釜鏁版槸鍚︿负1
                 va = varMatch.group();
                 time++;
             }
             boolean pass = false;
             int index = 0;
             for (int i = 0; i < newExp.vars.length; i++) {
-                if (newExp.vars[i].equals(va)) {  //是否存在该变量
+                if (newExp.vars[i].equals(va)) {  //鏄惁瀛樺湪璇ュ彉閲�
                     pass = true;
                     index = i;
                     break;
                 }
             }
             index++;
-            if (pass && time == 1) {  //求导，当且仅当存在变量且只有一个
-                for (int i = 0; i < newExp.length; i++) {  //每个项挨个求导
+            if (pass && time == 1) {  //姹傚锛屽綋涓斾粎褰撳瓨鍦ㄥ彉閲忎笖鍙湁涓�涓�
+                for (int i = 0; i < newExp.length; i++) {  //姣忎釜椤规尐涓眰瀵�
                     if (newExp.values[index][i] >= 1) {
                         newExp.values[0][i] *= newExp.values[index][i];
                         newExp.values[index][i] -= 1;
-                    } else if (newExp.values[index][i] == 0) {  //若次数为0，则该项系数变0
+                    } else if (newExp.values[index][i] == 0) {  //鑻ユ鏁颁负0锛屽垯璇ラ」绯绘暟鍙�0
                         newExp.values[0][i] = 0;
                     }
                 }
@@ -270,91 +280,91 @@ public class Main {
         }
         return null;
     }
-
-    /**
-     * 根据vars及values数组，进行多项式的同类项合并，以及字符串形式再生成(直接对原多项式修改)
+    
+    /**.
+     * 鏍规嵁vars鍙妚alues鏁扮粍锛岃繘琛屽椤瑰紡鐨勫悓绫婚」鍚堝苟锛屼互鍙婂瓧绗︿覆褰㈠紡鍐嶇敓鎴�(鐩存帴瀵瑰師澶氶」寮忎慨鏀�)
      */
     private void generate(Expression ex) {
-        TreeMap<String, Double> napeMap = new TreeMap<>();  //用于合并同类项
-
+        TreeMap<String, Double> napeMap = new TreeMap<>();  //鐢ㄤ簬鍚堝苟鍚岀被椤�
+        
         /*
-         * 先生成每一项的次数字符串（如x^2*y^3*z，则字符串为"2 3 0"）
-         * ，在TreeMap里以字符串为key将次数相加从而完成合并，再还原为数组形式
+         * 鍏堢敓鎴愭瘡涓�椤圭殑娆℃暟瀛楃涓诧紙濡倄^2*y^3*z锛屽垯瀛楃涓蹭负"2 3 0"锛�
+         * 锛屽湪TreeMap閲屼互瀛楃涓蹭负key灏嗘鏁扮浉鍔犱粠鑰屽畬鎴愬悎骞讹紝鍐嶈繕鍘熶负鏁扮粍褰㈠紡
          */
         for (int i = 0; i < ex.length; i++) {
             String key = "";
-            for (int j = 1; j < ex.values.length - 1; j++) {  //不需统计常数的次数
+            for (int j = 1; j < ex.values.length - 1; j++) {  //涓嶉渶缁熻甯告暟鐨勬鏁�
                 key += ex.values[j][i] + " ";
             }
-            if (ex.values.length > 1) {  //最后一个变量单独加入字符串，避免空格加入
+            if (ex.values.length > 1) {  //鏈�鍚庝竴涓彉閲忓崟鐙姞鍏ュ瓧绗︿覆锛岄伩鍏嶇┖鏍煎姞鍏�
                 key += ex.values[ex.values.length - 1][i];
             }
-            if (napeMap.containsKey(key)) {  //字串存在则相加（即合并）
+            if (napeMap.containsKey(key)) {  //瀛椾覆瀛樺湪鍒欑浉鍔狅紙鍗冲悎骞讹級
                 napeMap.put(key, napeMap.get(key) + ex.values[0][i]);
             } else {
                 napeMap.put(key, ex.values[0][i]);
             }
-            if (napeMap.get(key) == 0) {  //若该项系数为0，删掉
+            if (napeMap.get(key) == 0) {  //鑻ヨ椤圭郴鏁颁负0锛屽垹鎺�
                 napeMap.remove(key);
             }
         }
-
+        
         ex.length = napeMap.size();
-        ex.values = new double[ex.vars.length + 1][ex.length];  //重新还原为数组
+        ex.values = new double[ex.vars.length + 1][ex.length];  //閲嶆柊杩樺師涓烘暟缁�
         int i = 0;
         for (Map.Entry<String, Double> pair : napeMap.entrySet()
-                ) {  //遍历TreeMap，为数组赋值
+             ) {  //閬嶅巻TreeMap锛屼负鏁扮粍璧嬪��
             String[] p = pair.getKey().split(" ");
-            ex.values[0][i] = pair.getValue();  //常数
-            if (!pair.getKey().equals("")) {  //空字串说明无变量
+            ex.values[0][i] = pair.getValue();  //甯告暟
+            if (!pair.getKey().equals("")) {  //绌哄瓧涓茶鏄庢棤鍙橀噺
                 for (int j = 0; j < p.length; j++) {
                     ex.values[j + 1][i] = Double.parseDouble(p[j]);
                 }
             }
             ++i;
         }
-        //再生成格式化的字符串
+        //鍐嶇敓鎴愭牸寮忓寲鐨勫瓧绗︿覆
         ex.exp = "";
         for (int j = 0; j < ex.length; j++) {
-            if (ex.values[0][j] < 0) {  //正负号
+            if (ex.values[0][j] < 0) {  //姝ｈ礋鍙�
                 ex.exp += "-";
             } else if (j > 0) {
                 ex.exp += "+";
             }
-            if (ex.values[0][j] == (int) (ex.values[0][j])) {  //若为整数则强转为int，避免出现x.0
+            if (ex.values[0][j] == (int) (ex.values[0][j])) {  //鑻ヤ负鏁存暟鍒欏己杞负int锛岄伩鍏嶅嚭鐜皒.0
                 ex.exp += Math.abs((int) (ex.values[0][j]));
             } else {
                 DecimalFormat df = new DecimalFormat("#.######");
                 String t = df.format(Math.abs(ex.values[0][j]));
-                ex.exp += t;  //浮点数
+                ex.exp += t;  //娴偣鏁�
             }
-            for (int k = 0; k < ex.vars.length; k++) {  //变量处理
+            for (int k = 0; k < ex.vars.length; k++) {  //鍙橀噺澶勭悊
                 if (ex.values[k + 1][j] > 0) {
                     ex.exp += "*" + ex.vars[k];
-                    if (ex.values[k + 1][j] > 1) { //含有幂
-                        ex.exp += "^" + (int) ex.values[k + 1][j];  //次数为整数，直接取整
+                    if (ex.values[k + 1][j] > 1) { //鍚湁骞�
+                        ex.exp += "^" + (int) ex.values[k + 1][j];  //娆℃暟涓烘暣鏁帮紝鐩存帴鍙栨暣
                     }
                 }
             }
         }
-        //若是乘1则去掉
-        ex.exp = ex.exp.replaceAll("^1\\*", "");  //最开始的1
+        //鑻ユ槸涔�1鍒欏幓鎺�
+        ex.exp = ex.exp.replaceAll("^1\\*", "");  //鏈�寮�濮嬬殑1
         ex.exp = ex.exp.replaceAll("\\+1\\*", "+");
         ex.exp = ex.exp.replaceAll("-1\\*", "-");
         if (ex.exp.equals("")) {
             ex.exp = "0";
         }
     }
-
-    /**
-     * 与用户进行交互，调用其它函数进行处理
+    
+    /**.
+     * 涓庣敤鎴疯繘琛屼氦浜掞紝璋冪敤鍏跺畠鍑芥暟杩涜澶勭悊
      */
     public void answer() {
         Scanner scan = new Scanner(System.in);
         DecimalFormat df = new DecimalFormat("#.###");
         while (true) {
-            String line = scan.nextLine();  //读取输入
-            if (getExp() != null && line.matches("^!\\s*simplify.*")) {  //简化
+            String line = scan.nextLine();  //璇诲彇杈撳叆
+            if (getExp() != null && line.matches("^!\\s*simplify.*")) {  //绠�鍖�
                 long time = System.nanoTime();
                 Expression sim = simplify(line);
                 long useTime = System.nanoTime() - time;
@@ -364,7 +374,7 @@ public class Main {
                 } else {
                     System.out.println(sim.exp);
                 }
-            } else if (getExp() != null && line.matches("^!\\s*d/d.*")) {  //求导
+            } else if (getExp() != null && line.matches("^!\\s*d/d.*")) {  //姹傚
                 long time = System.nanoTime();
                 Expression der = derivative(line);
                 long useTime = System.nanoTime() - time;
@@ -374,22 +384,21 @@ public class Main {
                 } else {
                     System.out.println(der.exp);
                 }
-            } else {  //其它输入
+            } else {  //鍏跺畠杈撳叆
                 long time = System.nanoTime();
                 Expression newExp = expression(line);
                 long useTime = System.nanoTime() - time;
                 System.out.println("Used time: " + df.format(useTime / 1000000.0) + "ms, Result:");
-                if (newExp != null) {  //正确
+                if (newExp != null) {  //姝ｇ‘
                     setExp(newExp);
                     System.out.println(getExp().exp);
-                } else {  //出错
+                } else {  //鍑洪敊
                     System.out.println("Wrong polynomial!");
                 }
             }
         }
     }
-
-    public static void main(String[] args) {
-        new Main().answer();
+    
+    public static void main(String[] args) {new Main().answer();
     }
 }
